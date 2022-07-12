@@ -17,6 +17,7 @@ char *concat(char *, ...);
 /*
  * Turn a number into a string.
  * If no based is specified then base will be 10. Bellow there's the categories.
+ * Caller must free the return value.
  *
  * Binary : if base is 2
  *
