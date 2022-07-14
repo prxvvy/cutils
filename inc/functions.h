@@ -19,22 +19,26 @@
 // Created by prxvvy on 05/07/2022
 //
 
-#ifndef __UTILS_H__
-#define __UTILS_H__
+#ifndef _FUNCTIONS_H_
+#define _FUNCTIONS_H_
 
-typedef enum bool { false, true } bool;
+typedef enum bool
+{
+  false,
+  true
+} bool;
 
 /*
  * Concatenate strings just like sprintf but without passing a buffer.
  * Caller must free the return value.
  */
 
-char *concat(char *, ...);
+char *concat (char *, ...);
 
 /*
  * Turn a number into a string.
- * If no based is specified then base will be 10. Bellow there's the categories.
- * Caller must free the return value.
+ * If no based is specified then base will be 10. Bellow there's the
+ * categories. Caller must free the return value.
  *
  * Binary : if base is 2
  *
@@ -46,11 +50,12 @@ char *concat(char *, ...);
  *
  */
 
-char *itoa(int, int);
+char *itoa (int, int);
 
 /*
  * Count digits in a number.
- * If no based is specified then base will be 10. Bellow there's the categories.
+ * If no based is specified then base will be 10. Bellow there's the
+ * categories.
  *
  * Binary : if base is 2
  *
@@ -61,6 +66,12 @@ char *itoa(int, int);
  * Hex : base is 16
  */
 
-unsigned int count_digits(int, int);
+unsigned int count_digits (int, int);
 
-#endif	// __UTILS_H__
+/*
+ * Get input from stdin with an optional message as an instruction.
+ */
+
+char *get_input_from_stdin (char *);
+
+#endif // _FUNCTIONS_H_
