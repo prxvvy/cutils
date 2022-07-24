@@ -469,20 +469,30 @@ cut_str (char *p_str, unsigned int delimiter)
 bool
 strip (char *p_buffer, const char *p_str, const char *p_garbage)
 {
-  if (!p_buffer || !p_str || !p_garbage)
-    return 0;
+  if (!p_buffer || !p_str || !p_garbage || !strlen (p_str))
+    return false;
 
+  size_t p_str_end = strlen (p_str) - 1;
+  int p_str_start = 0;
   int writer = 0;
 
-  for (int idx = 0; p_str[idx] != 00; ++idx)
+  for (int idx = (int)p_str_end; idx >= 0 && p_str[idx] == ' '; --idx)
+    p_str_end--;
+
+  for (int idx = (int)p_str_start; p_str[idx] != 00 && p_str[idx] == ' ';
+       ++idx)
+    p_str_start++;
+
+  for (int idx = p_str_start; idx < (int)p_str_end + 1; ++idx)
     {
-      for (int sbindx = 0; p_garbage[sbindx] != 0; ++sbindx, writer++)
+
+      for (int sbindx = 0; p_garbage[sbindx] != 00; ++sbindx)
         while (p_str[idx] == p_garbage[sbindx])
-          idx++;
-      p_buffer[writer] = p_str[idx];
+          p_buffer[writer] = p_str[idx++];
+
+      p_buffer[writer++] = p_str[idx];
+      p_buffer[writer] = 00;
     }
 
-  p_buffer[writer] = 00;
-
-  return 1;
+  return true;
 }
