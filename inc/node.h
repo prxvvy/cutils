@@ -22,16 +22,26 @@
 #ifndef _NODE_H_
 #define _NODE_H_
 
+#include "bool.h"
+
+typedef enum TYPE
+{
+  STRING,
+  NUMBER,
+  UNKNOWN,
+} type;
+
 typedef struct node
 {
   void *p_value;
   struct node *p_next;
   struct node *p_previous;
-  unsigned int is_containing_string;
+  type type;
+  bool (*destroy_node) (struct node *);
 } node_t;
 
-node_t *create_node (void *p_value, unsigned int is_string);
+node_t *create_node (void *, type);
 
-int destroy_node (node_t *p_node);
+bool destroy_node (node_t *);
 
 #endif // _NODE_H_

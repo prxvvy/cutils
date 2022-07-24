@@ -19,17 +19,30 @@
 // Created by prxvvy on 10/04/2022
 //
 
-#include <list.h>
-#include <node.h>
+#include "inc/list.h"
+#include "inc/node.h"
 #include <stdlib.h>
 
 list_t *
 create_list ()
 {
   list_t *p_self = calloc (1, sizeof (struct list));
+  if (!p_self)
+    return NULL;
   p_self->p_head = NULL;
   p_self->p_tail = NULL;
   p_self->size = 0;
+  p_self->get_len = get_len;
+  p_self->destroy_list = destroy_list;
+  p_self->destroy_each_node = destroy_each_node;
+  p_self->insert_at_beginning = insert_at_beginning;
+  p_self->insert_at_end = insert_at_end;
+  p_self->insert_at = insert_at;
+  p_self->remove_at_beginning = remove_at_beginning;
+  p_self->remove_at_end = remove_at_end;
+  p_self->first_entry = first_entry;
+  p_self->get_node_at = get_node_at;
+  p_self->unlink_node = unlink_node;
   return p_self;
 }
 
@@ -39,37 +52,31 @@ get_len (list_t *p_list)
   return p_list->size;
 }
 
-int
-insert_at_beginning (list_t *p_list, void *p_value, unsigned int is_string)
+node_t *
+insert_at_beginning (list_t *p_list, void *p_value, type type)
 {
-  node_t *p_new_node
-      = create_node (p_value, is_string); /* Create a new node. */
+  node_t *p_new_node = create_node (p_value, type);
 
-  if (get_len (p_list) == 0)
-    return first_entry (p_list, p_new_node);
+  if (p_list->get_len (p_list) == 0)
+    return p_list->first_entry (p_list, p_new_node);
 
-  p_new_node->p_next = p_list->p_head; /* Next pointer of new node points to
-                                         the current head of the list. */
+  p_new_node->p_next = p_list->p_head;
   p_list->p_head->p_previous = p_new_node;
-  p_list->p_head = p_new_node; /* Update the head of the list. */
-  p_list->p_tail->p_next
-      = p_list->p_head; /* The tail of the list is still pointing to the old
-                           head so update the next pointer of the tail to new
-                           the head. */
+  p_list->p_head = p_new_node;
+  p_list->p_tail->p_next = p_list->p_head;
   p_list->p_head->p_previous = p_list->p_tail;
 
-  p_list->size++; /* Increment size */
+  p_list->size++;
 
-  return 1;
+  return p_new_node;
 }
 
-int
-insert_at_end (list_t *p_list, void *p_value, unsigned int is_string)
+node_t *
+insert_at_end (list_t *p_list, void *p_value, type type)
 {
-  node_t *p_new_node
-      = create_node (p_value, is_string); /* Create a new node. */
+  node_t *p_new_node = create_node (p_value, type);
 
-  if (get_len (p_list) == 0)
+  if (p_list->get_len (p_list) == 0)
     return first_entry (p_list, p_new_node);
 
   p_list->p_tail->p_next = p_new_node;
@@ -80,15 +87,15 @@ insert_at_end (list_t *p_list, void *p_value, unsigned int is_string)
 
   p_list->size++;
 
-  return 1;
+  return p_new_node;
 }
 
 node_t *
 remove_at_beginning (list_t *p_list)
 {
-  if (get_len (p_list) == 0)
-    return 0;
-  if (get_len (p_list) == 1)
+  if (p_list->get_len (p_list) == 0)
+    return NULL;
+  if (p_list->get_len (p_list) == 1)
     {
       node_t *p_node_to_destroy = p_list->p_head;
       p_list->p_head = NULL;
@@ -112,9 +119,9 @@ remove_at_beginning (list_t *p_list)
 node_t *
 remove_at_end (list_t *p_list)
 {
-  if (get_len (p_list) == 0)
-    return 0;
-  if (get_len (p_list) == 1)
+  if (p_list->get_len (p_list) == 0)
+    return NULL;
+  if (p_list->get_len (p_list) == 1)
     {
       node_t *p_node_to_destroy = p_list->p_head;
       p_list->p_head = NULL;
@@ -133,18 +140,17 @@ remove_at_end (list_t *p_list)
   return p_node_to_destroy;
 }
 
-node_t *pop (list_t *p_list, unsigned int index);
-
 node_t *
 remove_at (list_t *p_list, unsigned int index)
 {
-  if (get_len (p_list) == 0)
-    return 0;
-  if (get_len (p_list) != 0 && index > get_len (p_list))
-    return 0;
-  // if (index == NULL) return remove_at_end(p_list);
+  if (p_list->get_len (p_list) == 0)
+    return NULL;
+  if (p_list->get_len (p_list) != 0 && index > p_list->get_len (p_list))
+    return NULL;
+  if (!index)
+    return remove_at_end (p_list);
   if (index == 0)
-    return remove_at_beginning (p_list);
+    return p_list->remove_at_beginning (p_list);
 
   unsigned int i = 0;
 
@@ -155,13 +161,13 @@ remove_at (list_t *p_list, unsigned int index)
       p_node_ptr = p_node_ptr->p_next;
       i++;
       if (i != index && p_node_ptr == p_list->p_head)
-        return 0;
+        return NULL;
     }
 
   if (p_node_ptr == p_list->p_tail)
-    return remove_at_end (p_list);
+    return p_list->remove_at_end (p_list);
   else if (p_node_ptr == p_list->p_head)
-    return remove_at_beginning (p_list);
+    return p_list->remove_at_beginning (p_list);
   else
     {
       node_t *p_node_to_destroy = p_node_ptr;
@@ -174,7 +180,7 @@ remove_at (list_t *p_list, unsigned int index)
     }
 }
 
-int
+node_t *
 first_entry (list_t *p_list, node_t *p_node)
 {
   /* Have the new node be the new head and tail of the list because it's
@@ -190,59 +196,59 @@ first_entry (list_t *p_list, node_t *p_node)
   p_list->p_tail->p_next = p_list->p_head;
 
   p_list->size++; /* Increment size of the list. */
-  return 1;
+  return p_node;
 }
 
-int
+bool
 destroy_list (list_t *p_list)
 {
   free (p_list);
-  return 1;
+  return true;
 }
 
-int
+bool
 destroy_each_node (list_t *p_list)
 {
-  if (get_len (p_list) == 0)
-    return 0;
+  if (p_list->get_len (p_list) == 0)
+    return false;
   node_t *p_node = p_list->p_head;
 
-  for (unsigned int i = 0; i < get_len (p_list); ++i)
+  for (unsigned int i = 0; i < p_list->get_len (p_list); ++i)
     {
       node_t *p_tmp = p_node;
       p_node = p_node->p_next;
-      destroy_node (p_tmp);
+      p_tmp->destroy_node (p_tmp);
     }
 
-  return 1;
+  return true;
 }
 
 node_t *
 get_node_at (list_t *p_list, unsigned int index)
 {
-  if (get_len (p_list) == 0)
+  if (p_list->get_len (p_list) == 0)
     return NULL;
 
-  if (index > get_len (p_list))
-    return 0;
+  if (index > p_list->get_len (p_list))
+    return NULL;
 
   node_t *p_node = p_list->p_head;
 
-  for (unsigned int i = 0; i < get_len (p_list); ++i)
+  for (unsigned int i = 0; i < p_list->get_len (p_list); ++i)
     {
       if (i == index)
         return p_node;
       p_node = p_node->p_next;
     }
 
-  exit (0);
+  return NULL;
 }
 
-int
+node_t *
 unlink_node (list_t *p_list, node_t *p_node)
 {
-  if (get_len (p_list) == 0)
-    return 0;
+  if (p_list->get_len (p_list) == 0)
+    return NULL;
 
   if (p_node == p_list->p_head)
     {
@@ -253,8 +259,7 @@ unlink_node (list_t *p_list, node_t *p_node)
       p_list->p_head->p_previous = p_list->p_tail;
 
       p_list->size--;
-      destroy_node (p_toDestroy);
-      return 1;
+      return p_toDestroy;
     }
   else if (p_node == p_list->p_tail)
     {
@@ -266,8 +271,7 @@ unlink_node (list_t *p_list, node_t *p_node)
 
       p_list->size--;
 
-      destroy_node (p_toDestroy);
-      return 1;
+      return p_toDestroy;
     }
   else
     {
@@ -276,29 +280,26 @@ unlink_node (list_t *p_list, node_t *p_node)
 
       p_list->size--;
 
-      destroy_node (p_node);
-
-      return 1;
+      return p_node;
     }
 }
 
-int
-insert_at (list_t *p_list, void *p_value, unsigned int index,
-           unsigned int is_string)
+node_t *
+insert_at (list_t *p_list, void *p_value, unsigned int index, type type)
 {
-  node_t *p_new_node = create_node (p_value, is_string);
+  node_t *p_new_node = create_node (p_value, type);
 
-  if (index == 0 && get_len (p_list) == 0)
-    return first_entry (p_list, p_new_node);
+  if (index == 0 && p_list->get_len (p_list) == 0)
+    return p_list->first_entry (p_list, p_new_node);
 
-  else if (index == 0 && get_len (p_list) != 0)
-    return insert_at_beginning (p_list, p_value, is_string);
+  else if (index == 0 && p_list->get_len (p_list) != 0)
+    return p_list->insert_at_beginning (p_list, p_value, type);
 
   node_t *p_node = p_list->p_head;
 
   index -= 1;
 
-  for (unsigned int i = 0; i < get_len (p_list); ++i)
+  for (unsigned int i = 0; i < p_list->get_len (p_list); ++i)
     {
       if (i == index)
         break;
@@ -306,9 +307,7 @@ insert_at (list_t *p_list, void *p_value, unsigned int index,
     }
 
   if (p_node == p_list->p_tail)
-    return insert_at_end (p_list, p_value, is_string);
-  else if (p_node == p_list->p_head)
-    return insert_at_beginning (p_list, p_value, is_string);
+    return p_list->insert_at_end (p_list, p_value, type);
   else
     {
       p_node->p_next->p_previous = p_new_node;
@@ -317,6 +316,5 @@ insert_at (list_t *p_list, void *p_value, unsigned int index,
       p_new_node->p_previous = p_node;
       p_list->size++;
     }
-
-  return 1;
+  return p_new_node;
 }

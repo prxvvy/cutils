@@ -19,14 +19,12 @@
 // Created by prxvvy on 05/07/2022
 //
 
-#ifndef _FUNCTIONS_H_
-#define _FUNCTIONS_H_
+#ifndef _INDEPENDENT_H_
+#define _INDEPENDENT_H_
 
-typedef enum bool
-{
-  false,
-  true
-} bool;
+#include "bool.h"
+#include "list.h"
+#include <stdio.h>
 
 /*
  * Concatenate strings just like sprintf but without passing a buffer.
@@ -74,4 +72,78 @@ unsigned int count_digits (int, int);
 
 char *get_input_from_stdin (char *);
 
-#endif // _FUNCTIONS_H_
+/*
+ * Compare str 1 to str 2.
+ */
+
+bool compare_str (char *, char *);
+
+/*
+ * Reverse a string.
+ * Caller must free the return value.
+ *
+ */
+
+char *reverse_str (char *);
+
+/*
+ * Remove garbage characters from str.
+ * Write output to buffer;
+ */
+
+bool strip (char *, const char *, const char *);
+
+/*
+ * Check if str includes a specified character of substring.
+ */
+
+bool str_includes (char *, char, char *);
+
+/*
+ * Cut str up to delimiter.
+ * Caller must free the return value.
+ */
+
+char *cut_str (char *, unsigned int);
+
+/*
+ * Get a specified line froma  file by a given pattern.
+ */
+
+char *get_line_by_pattern (char *, char *);
+
+/*
+ * Get all lines from a file and make them a single string with their
+ * respective new line char.
+ * This function should not be conditioned in a loop
+ * to read line by line, use str_line_from_file() function instead.
+ * Caller must
+ * free the return value.
+ */
+
+char *str_all_lines_from_file (FILE *);
+
+/*
+ * Get the first line from a file.
+ * Can be conditioned in a loop to read line by line.
+ * Caller must free the return value.
+ */
+
+char *str_line_from_file (FILE *);
+
+/*
+ * Get line by line from a file and push them to a linked list.
+ * Caller must free the return list with destroy_each_node() and
+ * destroy_list().
+ */
+
+list_t *list_all_lines_from_file (char *);
+
+/*
+ * Split a string into a linked list. Just like the split method in other
+ * languages.
+ */
+
+list_t *split (char *, char);
+
+#endif // _INDEPENDENT_H_

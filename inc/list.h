@@ -22,45 +22,52 @@
 #ifndef _LIST_H_
 #define _LIST_H_
 
-#include <node.h>
+#include "bool.h"
+#include "node.h"
 
 typedef struct list
 {
   struct node *p_head;
   struct node *p_tail;
   unsigned int size;
+  unsigned int (*get_len) (struct list *);
+  bool (*destroy_list) (struct list *);
+  bool (*destroy_each_node) (struct list *);
+  node_t *(*insert_at_beginning) (struct list *, void *, type);
+  node_t *(*insert_at_end) (struct list *, void *, type);
+  node_t *(*insert_at) (struct list *, void *, unsigned int, type);
+  node_t *(*remove_at_beginning) (struct list *);
+  node_t *(*remove_at_end) (struct list *);
+  node_t *(*remove_at) (struct list *, unsigned int);
+  node_t *(*first_entry) (struct list *, node_t *);
+  node_t *(*get_node_at) (struct list *, unsigned int);
+  node_t *(*unlink_node) (struct list *, node_t *);
 } list_t;
 
 list_t *create_list ();
 
-int increment_node_position (list_t *p_list, node_t *p_node);
+unsigned int get_len (list_t *);
 
-unsigned int get_len (list_t *p_list);
+node_t *insert_at_beginning (list_t *, void *, type);
 
-int insert_at_beginning (list_t *p_list, void *p_value,
-                         unsigned int is_string);
+node_t *insert_at_end (list_t *, void *, type);
 
-int insert_at_end (list_t *p_list, void *p_value, unsigned int is_string);
+node_t *remove_at_beginning (list_t *);
 
-node_t *remove_at_beginning (list_t *p_list);
+node_t *remove_at_end (list_t *);
 
-node_t *remove_at_end (list_t *p_list);
+node_t *remove_at (list_t *, unsigned int);
 
-node_t *pop (list_t *p_list, unsigned int index);
+node_t *first_entry (list_t *, node_t *);
 
-node_t *remove_at (list_t *p_list, unsigned int index);
+bool destroy_list (list_t *);
 
-int first_entry (list_t *p_list, node_t *p_node);
+bool destroy_each_node (list_t *);
 
-int destroy_list (list_t *p_list);
+node_t *get_node_at (list_t *, unsigned int);
 
-int destroy_each_node (list_t *p_list);
+node_t *unlink_node (list_t *, node_t *);
 
-node_t *get_node_at (list_t *p_list, unsigned int index);
-
-int unlink_node (list_t *p_list, node_t *p_node);
-
-int insert_at (list_t *p_list, void *p_value, unsigned int index,
-               unsigned int is_string);
+node_t *insert_at (list_t *, void *, unsigned int, type);
 
 #endif // _LIST_H_
