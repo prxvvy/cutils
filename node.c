@@ -21,7 +21,6 @@
 
 #include "inc/node.h"
 #include "inc/independent.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,9 +29,9 @@ create_node (void *p_value, type type)
 {
   node_t *p_self = calloc (1, sizeof (struct node));
   if (!p_self)
-    return NULL;
-  p_self->p_next = NULL;
-  p_self->p_previous = NULL;
+    return ((void *)0);
+  p_self->p_next = ((void *)0);
+  p_self->p_previous = ((void *)0);
   p_self->type = type;
   switch (type)
     {
@@ -41,15 +40,14 @@ create_node (void *p_value, type type)
       strcpy (p_self->p_value, p_value);
       break;
     case NUMBER:
-      p_self->p_value
-          = calloc (count_digits (*(char *)p_value, 10), sizeof (int));
-      memcpy (p_self->p_value, p_value, count_digits (*(char *)p_value, 10));
+      p_self->p_value = calloc (sizeof (p_value), sizeof (p_value));
+      memcpy (p_self->p_value, p_value, sizeof (&p_value));
       break;
     case UNKNOWN:
       p_self->p_value = p_value;
       break;
     default:
-      p_self->p_value = NULL;
+      p_self->p_value = ((void *)0);
     }
   p_self->destroy_node = destroy_node;
   return p_self;
@@ -59,14 +57,9 @@ bool
 destroy_node (node_t *p_node)
 {
   if (p_node->type == STRING)
-    {
-
-      free (p_node->p_value);
-    }
+    free (p_node->p_value);
   else if (p_node->type == NUMBER)
-    {
-      free (p_node->p_value);
-    }
+    free (p_node->p_value);
   free (p_node);
   return 1;
 }

@@ -31,7 +31,7 @@ get_input_from_stdin (char *p_message)
 
   char *p_input = calloc (1, sizeof (char));
   if (!p_input)
-    return NULL;
+    return ((void *)0);
 
   if (p_message)
     printf ("%s", p_message);
@@ -46,7 +46,7 @@ get_input_from_stdin (char *p_message)
       if (!p_realloc_res)
         {
           free (p_input);
-          p_input = NULL;
+          p_input = ((void *)0);
           break;
         }
       p_input = p_realloc_res;
@@ -93,12 +93,12 @@ itoa (int number, int base)
   if (base < 2 || base > 36)
     {
       printf ("itoa(): Invalid base %d.\n", base);
-      return NULL;
+      return ((void *)0);
     }
 
   char *p_result = calloc (count_digits (number, base) + 1, sizeof (char));
   if (!p_result)
-    return NULL;
+    return ((void *)0);
   size_t p_result_len = strlen (p_result);
 
   if (number == 0)
@@ -141,7 +141,7 @@ concat (char *p_format, ...)
 {
   char *p_concat_str = calloc (1, sizeof (char));
   if (!p_concat_str)
-    return NULL;
+    return ((void *)0);
   va_list args;
   va_start (args, p_format);
   size_t p_concat_str_len = strlen (p_concat_str);
@@ -161,7 +161,7 @@ concat (char *p_format, ...)
           if (!p_realloc_res)
             {
               free (p_concat_str);
-              p_concat_str = NULL;
+              p_concat_str = ((void *)0);
               break;
             }
           p_concat_str = p_realloc_res;
@@ -181,7 +181,7 @@ concat (char *p_format, ...)
           if (!p_realloc_res)
             {
               free (p_concat_str);
-              p_concat_str = NULL;
+              p_concat_str = ((void *)0);
               break;
             }
           p_concat_str = p_realloc_res;
@@ -193,7 +193,7 @@ concat (char *p_format, ...)
       if (!p_realloc_res)
         {
           free (p_concat_str);
-          p_concat_str = NULL;
+          p_concat_str = ((void *)0);
           break;
         }
       p_concat_str = p_realloc_res;
@@ -228,7 +228,8 @@ compare_str (char *p_str_1, char *p_str_2)
 }
 
 bool
-str_includes (char *p_str, char char_to_find, char *p_str_to_find)
+str_includes (const char *p_str, const char char_to_find,
+              const char *p_str_to_find)
 {
   if (!p_str)
     return false;
@@ -271,38 +272,30 @@ str_includes (char *p_str, char char_to_find, char *p_str_to_find)
   return false;
 }
 
-char *
-reverse_str (char *p_str)
+int
+reverse_str (char *p_buffer, const char *p_str)
 {
-  if (!p_str)
+  if (!p_buffer)
+    return 0;
+  if (!p_str || !strlen (p_str))
     p_str = "(null)";
   if (strlen (p_str) < 2)
-    return NULL;
-  char *p_reversed_str = calloc (1, sizeof (char));
-  if (!p_reversed_str)
-    return NULL;
-  size_t p_reversed_str_len = strlen (p_reversed_str);
-
-  for (int i = strlen (p_str) - 1; i >= 0; --i)
+    return 0;
+  int writer = 0;
+  for (int idx = strlen (p_str) - 1; idx >= 0; --idx)
     {
-      char *p_realloc_res = realloc (p_reversed_str, p_reversed_str_len + 2);
-      if (!p_realloc_res)
-        {
-          free (p_reversed_str);
-          p_reversed_str = NULL;
-          break;
-        }
-      p_reversed_str = p_realloc_res;
-      p_reversed_str[p_reversed_str_len++] = p_str[i];
-      p_reversed_str[p_reversed_str_len] = 00;
+      p_buffer[writer++] = p_str[idx];
+      p_buffer[writer] = 00;
     }
-  return p_reversed_str;
+  return 1;
 }
 
 char *
 str_all_lines_from_file (FILE *p_file)
 {
   char *p_line = calloc (1, sizeof (char));
+  if (!p_line)
+    return ((void *)0);
   size_t p_line_len = strlen (p_line);
 
   char current_char;
@@ -313,7 +306,7 @@ str_all_lines_from_file (FILE *p_file)
       if (!p_realloc_res)
         {
           free (p_line);
-          p_line = NULL;
+          p_line = ((void *)0);
           break;
         }
       p_line = p_realloc_res;
@@ -327,7 +320,11 @@ str_all_lines_from_file (FILE *p_file)
 char *
 str_line_from_file (FILE *p_file)
 {
+  if (!p_file)
+    return ((void *)0);
   char *p_line = calloc (1, sizeof (char));
+  if (!p_line)
+    return ((void *)0);
   size_t p_line_len = strlen (p_line);
 
   char current_char;
@@ -339,7 +336,7 @@ str_line_from_file (FILE *p_file)
       if (!p_realloc_res)
         {
           free (p_line);
-          p_line = NULL;
+          p_line = ((void *)0);
           break;
         }
       p_line = p_realloc_res;
@@ -349,20 +346,21 @@ str_line_from_file (FILE *p_file)
   if (current_char == EOF)
     {
       free (p_line);
-      p_line = NULL;
+      p_line = ((void *)0);
     }
   return p_line;
 }
 
 char *
-get_line_by_pattern (char *p_file_name, char *p_pattern)
+get_line_by_pattern (const char *p_file_name, const char *p_pattern)
 {
-  if (!p_file_name || !p_pattern)
-    return NULL;
+  if (!p_file_name || !p_pattern || !strlen (p_pattern)
+      || !strlen (p_file_name))
+    return ((void *)0);
   FILE *p_file = fopen (p_file_name, "r");
   if (!p_file)
-    return NULL;
-  char *p_line = NULL;
+    return ((void *)0);
+  char *p_line = ((void *)0);
   while ((p_line = str_line_from_file (p_file)))
     {
       if (str_includes (p_line, 00, p_pattern) == true)
@@ -374,16 +372,18 @@ get_line_by_pattern (char *p_file_name, char *p_pattern)
 }
 
 list_t *
-list_all_lines_from_file (char *p_file_name)
+list_all_lines_from_file (const char *p_file_name)
 {
+  if (!p_file_name || !strlen (p_file_name))
+    return ((void *)0);
   list_t *p_list = create_list ();
   if (!p_list)
-    return NULL;
+    return ((void *)0);
   FILE *p_file = fopen (p_file_name, "r");
   if (!p_file)
-    return NULL;
+    return ((void *)0);
 
-  char *p_line = NULL;
+  char *p_line = ((void *)0);
 
   while ((p_line = str_line_from_file (p_file)))
     {
@@ -396,14 +396,16 @@ list_all_lines_from_file (char *p_file_name)
 }
 
 list_t *
-split (char *p_str, char sep)
+split (const char *p_str, char sep)
 {
   list_t *p_main_list = create_list ();
   if (!p_main_list)
-    return NULL;
+    return ((void *)0);
   if (!sep)
     sep = ' ';
   char *p_text_element = calloc (1, sizeof (char));
+  if (!p_text_element)
+    return ((void *)0);
   size_t p_text_element_len = strlen (p_text_element);
   for (size_t i = 0; p_str[i] != '\0'; ++i)
     {
@@ -413,7 +415,7 @@ split (char *p_str, char sep)
             {
               p_main_list->insert_at_end (p_main_list, p_text_element, STRING);
               free (p_text_element);
-              p_text_element = NULL;
+              p_text_element = ((void *)0);
               p_text_element_len = 0;
             }
           continue;
@@ -422,7 +424,7 @@ split (char *p_str, char sep)
       if (!p_realloc_res)
         {
           free (p_text_element);
-          p_text_element = NULL;
+          p_text_element = ((void *)0);
           break;
         }
       p_text_element = p_realloc_res;
@@ -435,35 +437,6 @@ split (char *p_str, char sep)
 
   free (p_text_element);
   return p_main_list;
-}
-
-char *
-cut_str (char *p_str, unsigned int delimiter)
-{
-  if (!p_str)
-    return NULL;
-  if (delimiter > strlen (p_str) || delimiter < 0)
-    return NULL;
-  char *p_new_str = calloc (1, sizeof (char));
-  if (!p_new_str)
-    return NULL;
-  size_t p_new_str_len = strlen (p_new_str);
-  for (int i = 0; i != delimiter; ++i)
-    {
-      if (p_str[i] == 00 && i != delimiter)
-        return NULL;
-      char *p_realloc_res = realloc (p_new_str, p_new_str_len + 2);
-      if (!p_realloc_res)
-        {
-          free (p_new_str);
-          p_new_str = NULL;
-          break;
-        };
-      p_new_str = p_realloc_res;
-      p_new_str[p_new_str_len++] = p_str[i];
-      p_new_str[p_new_str_len] = 00;
-    }
-  return p_new_str;
 }
 
 bool

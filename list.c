@@ -28,9 +28,9 @@ create_list ()
 {
   list_t *p_self = calloc (1, sizeof (struct list));
   if (!p_self)
-    return NULL;
-  p_self->p_head = NULL;
-  p_self->p_tail = NULL;
+    return ((void *)0);
+  p_self->p_head = ((void *)0);
+  p_self->p_tail = ((void *)0);
   p_self->size = 0;
   p_self->get_len = get_len;
   p_self->destroy_list = destroy_list;
@@ -57,6 +57,9 @@ insert_at_beginning (list_t *p_list, void *p_value, type type)
 {
   node_t *p_new_node = create_node (p_value, type);
 
+  if ((!p_new_node))
+    return ((void *)0);
+
   if (p_list->get_len (p_list) == 0)
     return p_list->first_entry (p_list, p_new_node);
 
@@ -76,6 +79,9 @@ insert_at_end (list_t *p_list, void *p_value, type type)
 {
   node_t *p_new_node = create_node (p_value, type);
 
+  if (!p_new_node)
+    return ((void *)0);
+
   if (p_list->get_len (p_list) == 0)
     return first_entry (p_list, p_new_node);
 
@@ -94,14 +100,14 @@ node_t *
 remove_at_beginning (list_t *p_list)
 {
   if (p_list->get_len (p_list) == 0)
-    return NULL;
+    return ((void *)0);
   if (p_list->get_len (p_list) == 1)
     {
       node_t *p_node_to_destroy = p_list->p_head;
-      p_list->p_head = NULL;
-      p_list->p_tail = NULL;
-      p_node_to_destroy->p_next = NULL;
-      p_node_to_destroy->p_previous = NULL;
+      p_list->p_head = ((void *)0);
+      p_list->p_tail = ((void *)0);
+      p_node_to_destroy->p_next = ((void *)0);
+      p_node_to_destroy->p_previous = ((void *)0);
       p_list--;
       return p_node_to_destroy;
     }
@@ -110,8 +116,8 @@ remove_at_beginning (list_t *p_list)
   p_list->p_head = p_list->p_head->p_next;
   p_list->p_head->p_previous = p_list->p_tail;
   p_list->p_tail->p_next = p_list->p_head;
-  p_node_to_destroy->p_next = NULL;
-  p_node_to_destroy->p_previous = NULL;
+  p_node_to_destroy->p_next = ((void *)0);
+  p_node_to_destroy->p_previous = ((void *)0);
   p_list->size--;
   return p_node_to_destroy;
 }
@@ -120,12 +126,12 @@ node_t *
 remove_at_end (list_t *p_list)
 {
   if (p_list->get_len (p_list) == 0)
-    return NULL;
+    return ((void *)0);
   if (p_list->get_len (p_list) == 1)
     {
       node_t *p_node_to_destroy = p_list->p_head;
-      p_list->p_head = NULL;
-      p_list->p_tail = NULL;
+      p_list->p_head = ((void *)0);
+      p_list->p_tail = ((void *)0);
       p_list->size--;
       return p_node_to_destroy;
     }
@@ -134,8 +140,8 @@ remove_at_end (list_t *p_list)
   p_list->p_tail = p_list->p_tail->p_previous;
   p_list->p_tail->p_next = p_list->p_head;
   p_list->p_head->p_previous = p_list->p_tail;
-  p_node_to_destroy->p_previous = NULL;
-  p_node_to_destroy->p_next = NULL;
+  p_node_to_destroy->p_previous = ((void *)0);
+  p_node_to_destroy->p_next = ((void *)0);
   p_list->size--;
   return p_node_to_destroy;
 }
@@ -144,9 +150,9 @@ node_t *
 remove_at (list_t *p_list, unsigned int index)
 {
   if (p_list->get_len (p_list) == 0)
-    return NULL;
+    return ((void *)0);
   if (p_list->get_len (p_list) != 0 && index > p_list->get_len (p_list))
-    return NULL;
+    return ((void *)0);
   if (!index)
     return remove_at_end (p_list);
   if (index == 0)
@@ -161,7 +167,7 @@ remove_at (list_t *p_list, unsigned int index)
       p_node_ptr = p_node_ptr->p_next;
       i++;
       if (i != index && p_node_ptr == p_list->p_head)
-        return NULL;
+        return ((void *)0);
     }
 
   if (p_node_ptr == p_list->p_tail)
@@ -173,8 +179,8 @@ remove_at (list_t *p_list, unsigned int index)
       node_t *p_node_to_destroy = p_node_ptr;
       p_node_to_destroy->p_previous->p_next = p_node_to_destroy->p_next;
       p_node_to_destroy->p_next->p_previous = p_node_to_destroy->p_previous;
-      p_node_to_destroy->p_previous = NULL;
-      p_node_to_destroy->p_next = NULL;
+      p_node_to_destroy->p_previous = ((void *)0);
+      p_node_to_destroy->p_next = ((void *)0);
       p_list->size--;
       return p_node_to_destroy;
     }
@@ -227,10 +233,10 @@ node_t *
 get_node_at (list_t *p_list, unsigned int index)
 {
   if (p_list->get_len (p_list) == 0)
-    return NULL;
+    return ((void *)0);
 
   if (index > p_list->get_len (p_list))
-    return NULL;
+    return ((void *)0);
 
   node_t *p_node = p_list->p_head;
 
@@ -241,14 +247,14 @@ get_node_at (list_t *p_list, unsigned int index)
       p_node = p_node->p_next;
     }
 
-  return NULL;
+  return ((void *)0);
 }
 
 node_t *
 unlink_node (list_t *p_list, node_t *p_node)
 {
   if (p_list->get_len (p_list) == 0)
-    return NULL;
+    return ((void *)0);
 
   if (p_node == p_list->p_head)
     {
@@ -288,6 +294,9 @@ node_t *
 insert_at (list_t *p_list, void *p_value, unsigned int index, type type)
 {
   node_t *p_new_node = create_node (p_value, type);
+
+  if (!p_new_node)
+    return ((void *)0);
 
   if (index == 0 && p_list->get_len (p_list) == 0)
     return p_list->first_entry (p_list, p_new_node);

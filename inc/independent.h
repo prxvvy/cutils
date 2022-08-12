@@ -79,12 +79,10 @@ char *get_input_from_stdin (char *);
 bool compare_str (char *, char *);
 
 /*
- * Reverse a string.
- * Caller must free the return value.
- *
+ * Reverse str.
  */
 
-char *reverse_str (char *);
+int reverse_str (char *, const char *);
 
 /*
  * Remove garbage characters from str.
@@ -97,20 +95,13 @@ bool strip (char *, const char *, const char *);
  * Check if str includes a specified character of substring.
  */
 
-bool str_includes (char *, char, char *);
-
-/*
- * Cut str up to delimiter.
- * Caller must free the return value.
- */
-
-char *cut_str (char *, unsigned int);
+bool str_includes (const char *, const char, const char *);
 
 /*
  * Get a specified line froma  file by a given pattern.
  */
 
-char *get_line_by_pattern (char *, char *);
+char *get_line_by_pattern (const char *, const char *);
 
 /*
  * Get all lines from a file and make them a single string with their
@@ -137,13 +128,13 @@ char *str_line_from_file (FILE *);
  * destroy_list().
  */
 
-list_t *list_all_lines_from_file (char *);
+list_t *list_all_lines_from_file (const char *);
 
 /*
  * Split a string into a linked list. Just like the split method in other
  * languages.
  */
 
-list_t *split (char *, char);
+list_t *split (const char *, char);
 
 #endif // _INDEPENDENT_H_
